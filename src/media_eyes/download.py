@@ -7,6 +7,15 @@ import sys
 from yt_dlp import YoutubeDL
 
 
+def media_filter(info, *, incomplete=False):
+    if info.get("is_live") or (info.get("duration") or 0) > 3600:
+        return "Live/long media is unsupported"
+    protocol = info.get("protocol")
+    if protocol and protocol not in ("http", "https", "m3u8_native", "http_dash_segments"):
+        return "Only native HTTP media downloads are permitted"
+    return None
+
+
 class PublicSocket(socket.socket):
     def connect(self, address):
         if self.family not in (socket.AF_INET, socket.AF_INET6):
@@ -42,11 +51,7 @@ def main():
             "external_downloader": {"default": "native"},
             "proxy": "",
             "enable_file_urls": False,
-            "match_filter": lambda info, *, incomplete=False: (
-                "Live/long media is unsupported"
-                if info.get("is_live") or (info.get("duration") or 0) > 3600
-                else None
-            ),
+            "match_filter": media_filter,
         }
     ) as downloader:
         downloader.download([sys.argv[1]])

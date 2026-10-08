@@ -20,6 +20,14 @@ class MediaEyes:
 
     @staticmethod
     def run(args: list[str], timeout: int = 120) -> str:
+        if args[0] in ("ffmpeg", "ffprobe"):
+            # Reject playlist/concat demuxers that could read files outside allowed roots.
+            args = [
+                args[0],
+                "-format_whitelist",
+                "mov,matroska,mp3,wav,ogg,flac,aac,mpegts,mpeg,avi",
+                *args[1:],
+            ]
         try:
             result = subprocess.run(args, capture_output=True, timeout=timeout, check=True)
         except FileNotFoundError as exc:

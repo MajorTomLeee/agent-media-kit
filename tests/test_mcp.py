@@ -7,12 +7,20 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from test_core import media  # noqa: F401
 
-from media_eyes.download import PublicSocket
+from media_eyes.download import PublicSocket, media_filter
 
 
 def test_private_socket_blocked():
     with PublicSocket() as sock, pytest.raises(OSError, match="Private"):
         sock.connect(("127.0.0.1", 80))
+
+
+def test_download_protocols():
+    assert media_filter({"protocol": "https"}) is None
+    assert media_filter({"protocol": "m3u8_native"}) is None
+    for protocol in ("rtmp", "rtsp", "m3u8", "file"):
+        assert media_filter({"protocol": protocol}) is not None
+    assert media_filter({"is_live": True}) is not None
 
 
 def test_real_mcp_images(media, tmp_path):  # noqa: F811

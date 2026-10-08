@@ -4,7 +4,8 @@ RUN git clone https://github.com/ggml-org/whisper.cpp.git /src \
     && git -C /src checkout 48f628a84833905ee4a0658ee6d4a5c915ce1997 \
     && cmake -S /src -B /build -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF -DWHISPER_BUILD_TESTS=OFF \
     && cmake --build /build --target whisper-cli -j 2 \
-    && sh /src/models/download-ggml-model.sh base
+    && sh /src/models/download-ggml-model.sh base \
+    && echo '60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe  /src/models/ggml-base.bin' | sha256sum -c -
 
 FROM python:3.12-alpine3.23
 RUN apk add --no-cache ffmpeg libstdc++

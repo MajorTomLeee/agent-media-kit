@@ -73,3 +73,10 @@ def test_json_interface(media, tmp_path):
     )
     content = json.loads(result.stdout)["content"]
     assert json.loads(content[0]["text"])["has_video"]
+
+
+def test_playlist_cannot_read_other_files(tmp_path):
+    playlist = tmp_path / "playlist.mp4"
+    playlist.write_text("#EXTM3U\n#EXTINF:1,\nfile:/etc/passwd\n#EXT-X-ENDLIST\n")
+    with pytest.raises(ValueError, match="ffprobe failed"):
+        MediaEyes(tmp_path / "cache", roots=[tmp_path]).open_media(str(playlist))

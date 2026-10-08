@@ -16,6 +16,10 @@ from .diagnostics import classify, emit
 MERGER_ARGS = ["-protocol_whitelist", "file,pipe", "-format_whitelist", LOCAL_MEDIA_FORMATS]
 
 
+def selected_backend():
+    return sys.argv[3] if len(sys.argv) > 3 else "yt-dlp"
+
+
 def media_filter(info, *, incomplete=False):
     if info.get("is_live") or (info.get("duration") or 0) > 3600:
         return "Live/long media is unsupported"
@@ -74,7 +78,7 @@ def download():
 
         downloader.add_default_info_extractors()
         downloader.add_info_extractor(BilibiliPublicApiIE())
-        backend = sys.argv[3] if len(sys.argv) > 3 else "yt-dlp"
+        backend = selected_backend()
         if backend != "yt-dlp":
             from .providers import resolve
 
@@ -166,13 +170,24 @@ def download():
 
 def main():
     emit("download_started")
-    try:
-        download()
-    except (DownloadError, ExtractorError, ValueError, KeyError, TypeError, OSError) as error:
-        emit("download_failed", **classify(error))
-        return 1
-    emit("download_completed")
-    return 0
+    for attempt in range(1, 3):
+        try:
+            download()
+        except (DownloadError, ExtractorError, ValueError, KeyError, TypeError, OSError) as error:
+            diagnostic = classify(error)
+            if (
+                attempt == 1
+                and selected_backend() == "yt-dlp"
+                and diagnostic["error_code"] == "NETWORK_ERROR"
+            ):
+                # Refresh metadata/CDN addresses once; native downloads can resume partial files.
+                # Never retry access/anti-bot denials or bill an optional resolver a second time.
+                emit("download_retry", attempt=2, **diagnostic)
+                continue
+            emit("download_failed", **diagnostic)
+            return 1
+        emit("download_completed")
+        return 0
 
 
 if __name__ == "__main__":

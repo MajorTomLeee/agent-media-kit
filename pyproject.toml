@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-media-kit"
-version = "0.2.1"
+version = "0.2.2"
 description = "Video and audio tools for AI coding agents: website links, timestamped frames and transcripts over MCP."
 requires-python = ">=3.11"
 license = "MIT"

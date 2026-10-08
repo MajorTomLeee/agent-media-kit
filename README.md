@@ -38,7 +38,7 @@ Add to your MCP client configuration:
   "mcpServers": {
     "agent-media-kit": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.1", "agent-media-kit"]
+      "args": ["--from", "git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.2", "agent-media-kit"]
     }
   }
 }
@@ -47,7 +47,7 @@ Add to your MCP client configuration:
 Claude Code:
 
 ```sh
-claude mcp add agent-media-kit -- uvx --from git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.1 agent-media-kit
+claude mcp add agent-media-kit -- uvx --from git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.2 agent-media-kit
 ```
 
 Then ask:
@@ -57,7 +57,7 @@ Then ask:
 For local speech transcription, change the package argument to:
 
 ```text
-agent-media-kit[transcription] @ git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.1
+agent-media-kit[transcription] @ git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.2
 ```
 
 The first transcription downloads the Whisper model. Default: `base`, CPU int8. Set `MEDIA_EYES_WHISPER_MODEL` to select another model. Alternatively install `whisper-cli` from whisper.cpp and set `MEDIA_EYES_WHISPER_CPP_MODEL` to your local ggml model file; the included Dockerfile builds that backend with the multilingual base model.
@@ -90,7 +90,9 @@ Times are seconds. Image outputs alternate timestamp labels and JPEG image block
 
 For ordinary Bilibili BV/AV videos, a webpage HTTP 412 triggers one fallback to the public WBI-signed API, using yt-dlp's pinned signing and stream parser. Requested `?p=N` parts are preserved. This does not log in, solve CAPTCHAs, or unlock paid/preview-only videos. API and CDN requests still use the public-IP socket guard. If the API is also blocked, the tool reports the real failure category and HTTP status rather than claiming it watched the video.
 
-Website failures include `PLATFORM_BLOCKED` (HTTP 412/429), `ACCESS_REQUIRED` (401/403), `SOURCE_UNAVAILABLE` (404/410), and `DRM_UNSUPPORTED`. Safe lifecycle/fallback diagnostics go to stderr as JSON; MCP results remain on stdout. Credentials, cookies and signed CDN URLs are not included in diagnostic records.
+Interrupted native downloads refresh metadata and retry once for recognized timeouts, incomplete transfers, connection/DNS failures or HTTP 500/502/503/504. Recovery is bounded: access denials, private-network guards and format errors are not retried. Optional Cobalt/TikHub calls are not repeated automatically, avoiding unexpected charges.
+
+Website failures include `NETWORK_ERROR` (with a safe failure-reason category), `PLATFORM_BLOCKED` (HTTP 412/429), `ACCESS_REQUIRED` (401/403), `SOURCE_UNAVAILABLE` (404/410), and `DRM_UNSUPPORTED`. Safe lifecycle/fallback/retry diagnostics go to stderr as JSON; MCP results remain on stdout. Credentials, cookies and signed CDN URLs are not included in diagnostic records.
 
 Run the real website smoke yourself after installing the package:
 
@@ -129,7 +131,7 @@ for await (const message of query({
     mcpServers: {
       'agent-media-kit': {
         command: 'uvx',
-        args: ['--from', 'git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.1', 'agent-media-kit'],
+        args: ['--from', 'git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.2', 'agent-media-kit'],
       },
     },
     allowedTools: ['mcp__agent-media-kit__*'],

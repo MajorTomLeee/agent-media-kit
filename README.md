@@ -7,7 +7,7 @@
 
 Local files or website links → timestamped images and audio evidence → your agent's next action.
 
-Built by [Bowie](https://github.com/MajorTomLeee), with AI assistance. Designed for Claude Code, Claude Agent SDK, Cursor and other MCP clients. Wanaka integration is being developed alongside this project.
+Built by [Bowie](https://github.com/MajorTomLeee), with AI assistance. Designed for Claude Code, Claude Agent SDK, Cursor and other MCP clients. See the [Wanaka integration](https://github.com/Wanaka-studio/wanaka-platform/pull/9255) for a production agent adapter with project-isolated attachments, pinned installation and credential-safe subprocesses.
 
 ## Why Agent Media Kit?
 

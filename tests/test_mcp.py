@@ -42,7 +42,17 @@ def test_real_mcp_images(media, tmp_path):  # noqa: F811
             async with ClientSession(reader, writer) as session:
                 await session.initialize()
                 tools = await session.list_tools()
-                assert len(tools.tools) == 6
+                assert {t.name for t in tools.tools} == {
+                    "open_media",
+                    "get_overview",
+                    "get_frame",
+                    "inspect_segment",
+                    "get_audio_segment",
+                    "read_transcript",
+                    "analyze_media",
+                    "cleanup_cache",
+                    "analyze_audio",
+                }
                 opened = await session.call_tool("open_media", {"source": str(path)})
                 assert not opened.isError
                 identity = json.loads(opened.content[0].text)["media_id"]

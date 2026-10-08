@@ -3,25 +3,30 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "media-eyes"
-version = "0.1.0"
-description = "Give AI agents eyes and ears: timestamped video frames, audio clips and transcripts over MCP."
+name = "agent-media-kit"
+version = "0.2.0"
+description = "Video and audio tools for AI coding agents: website links, timestamped frames and transcripts over MCP."
 requires-python = ">=3.11"
 license = "MIT"
 authors = [{name = "Bowie", email = "bowie@wanaka.com"}]
 keywords = ["mcp", "video", "audio", "claude", "agent", "youtube", "ffmpeg"]
-dependencies = ["mcp>=1.20,<2", "yt-dlp>=2025.1"]
+dependencies = ["mcp>=1.20,<2", "yt-dlp>=2025.1", "filelock>=3.20,<4"]
 
 [project.optional-dependencies]
 transcription = ["faster-whisper>=1.2,<2"]
+audio-analysis = ["google-genai>=1,<2"]
 dev = ["pytest>=8", "ruff>=0.12"]
 
 [project.scripts]
+agent-media-kit = "media_eyes.server:main"
 media-eyes = "media_eyes.server:main"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/media_eyes"]
+
 [project.urls]
-Homepage = "https://github.com/MajorTomLeee/media-eyes"
-Issues = "https://github.com/MajorTomLeee/media-eyes/issues"
+Homepage = "https://github.com/MajorTomLeee/agent-media-kit"
+Issues = "https://github.com/MajorTomLeee/agent-media-kit/issues"
 
 [tool.ruff]
 line-length = 100

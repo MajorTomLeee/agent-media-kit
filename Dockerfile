@@ -18,4 +18,4 @@ RUN pip install --no-cache-dir . \
     && adduser -D -u 10001 media
 USER media
 ENV MEDIA_EYES_WHISPER_CPP_MODEL=/opt/media-eyes/ggml-base.bin
-ENTRYPOINT ["media-eyes"]
+ENTRYPOINT ["agent-media-kit"]

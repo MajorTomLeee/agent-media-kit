@@ -25,7 +25,7 @@ def main():
     def text(value):
         return TextContent(type="text", text=json.dumps(value, ensure_ascii=False))
 
-    def frames(media_id, times):
+    def frames(media_id, times, format="jpeg", width=1280):
         result = []
         for timestamp in times:
             result.extend(
@@ -33,9 +33,9 @@ def main():
                     text({"media_id": media_id, "timestamp": timestamp}),
                     ImageContent(
                         type="image",
-                        mimeType="image/jpeg",
+                        mimeType=f"image/{format}",
                         data=base64.b64encode(
-                            engine.frame(media_id, timestamp).read_bytes()
+                            engine.frame(media_id, timestamp, format, width).read_bytes()
                         ).decode(),
                     ),
                 ]
@@ -45,9 +45,9 @@ def main():
     mcp = FastMCP("media-eyes")
 
     @mcp.tool()
-    def open_media(source: str) -> list:
+    def open_media(source: str, backend: str = "yt-dlp") -> list:
         """Open a local video/audio file or public website URL. Returns media_id and duration."""
-        return [text(engine.open_media(source))]
+        return [text(engine.open_media(source, backend))]
 
     @mcp.tool()
     def get_overview(media_id: str, count: int = 8) -> list:
@@ -66,9 +66,9 @@ def main():
         return frames(media_id, engine.timestamps(media_id, 0, media["duration"], count))
 
     @mcp.tool()
-    def get_frame(media_id: str, timestamp: float) -> list:
+    def get_frame(media_id: str, timestamp: float, format: str = "jpeg", width: int = 1280) -> list:
         """Observe the video frame at a specific time in seconds."""
-        return frames(media_id, [timestamp])
+        return frames(media_id, [timestamp], format, width)
 
     @mcp.tool()
     def inspect_segment(media_id: str, start: float, end: float, count: int = 12) -> list:
@@ -89,9 +89,32 @@ def main():
         ]
 
     @mcp.tool()
-    def read_transcript(media_id: str, start: float = 0, end: float | None = None) -> list:
+    def read_transcript(
+        media_id: str, start: float = 0, end: float | None = None, language: str = "auto"
+    ) -> list:
         """Read cached timestamped speech transcription. Requires the transcription extra; not sound-effect analysis."""
-        return [text(engine.transcript(media_id, start, end))]
+        return [text(engine.transcript(media_id, start, end, language))]
+
+    @mcp.tool()
+    def analyze_media(
+        media_id: str,
+        start: float = 0,
+        end: float | None = None,
+        scene_threshold: float = 0.3,
+        silence_db: float = -35,
+    ) -> list:
+        """Locate scene transitions and silence to choose interesting segments. Not semantic audio analysis."""
+        return [text(engine.analyze_media(media_id, start, end, scene_threshold, silence_db))]
+
+    @mcp.tool()
+    def cleanup_cache() -> list:
+        """Remove derived evidence older than 7 days or above the 2 GiB cache budget; never deletes original uploads."""
+        return [text(engine.cleanup_cache())]
+
+    @mcp.tool()
+    def analyze_audio(media_id: str, start: float, end: float) -> list:
+        """Opt-in cloud sound/music analysis, max 60s. Requires explicitly configured Gemini key/model; sends audio to Google and may incur charges."""
+        return [text(engine.analyze_audio(media_id, start, end))]
 
     functions = {
         fn.__name__: fn
@@ -102,6 +125,9 @@ def main():
             inspect_segment,
             get_audio_segment,
             read_transcript,
+            analyze_media,
+            cleanup_cache,
+            analyze_audio,
         ]
     }
     if args.json:

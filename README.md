@@ -1,5 +1,8 @@
 # Media Eyes — Video & Audio MCP for AI Agents
 
+[![CI](https://github.com/MajorTomLeee/media-eyes/actions/workflows/ci.yml/badge.svg)](https://github.com/MajorTomLeee/media-eyes/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 **Let your agent look at videos, revisit moments, and read audio transcripts.**
 
 Local files or website links → timestamped images and audio evidence → your agent's next action.
@@ -58,6 +61,10 @@ media-eyes[transcription] @ git+https://github.com/MajorTomLeee/media-eyes@v0.1.
 ```
 
 The first transcription downloads the Whisper model. Default: `base`, CPU int8. Set `MEDIA_EYES_WHISPER_MODEL` to select another model. Alternatively install `whisper-cli` from whisper.cpp and set `MEDIA_EYES_WHISPER_CPP_MODEL` to your local ggml model file; the included Dockerfile builds that backend with the multilingual base model.
+
+### Try it without your own recording
+
+A tiny [synthetic demo video](https://github.com/MajorTomLeee/media-eyes/releases/download/v0.1.0/media-eyes-demo.mp4) is available in the release. Give that URL to your agent and ask it to open the media and inspect the interval from 0 to 2 seconds. It contains a test pattern and a tone, **not speech**; use your own voice note to try transcription.
 
 ## Tools
 

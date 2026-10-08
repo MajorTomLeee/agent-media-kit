@@ -110,6 +110,8 @@ printf '%s' '{"tool":"open_media","arguments":{"source":"/absolute/path/demo.mp4
 
 ## Limits and deployment
 
+If a proxy uses fake-IP DNS (for example, resolves public sites to `198.18.x.x`), URL access is rejected intentionally. Configure real public DNS for the media worker; do not disable the private-network checks. Website support also depends on yt-dlp and each site's access policy.
+
 - Finite files up to 256 MiB and one hour. Live streams are outside this release.
 - Website retrieval uses yt-dlp. Site support depends on extractor health, geography and access; login/DRM content is not promised.
 - Speech transcription does not understand music, sound effects, speakers' identities or emotion. Claude clients that do not accept audio should use transcripts; native audio analysis needs a separate model integration.

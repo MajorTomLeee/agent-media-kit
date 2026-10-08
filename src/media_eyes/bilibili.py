@@ -11,6 +11,11 @@ from .diagnostics import emit
 
 
 class BilibiliPublicApiIE(BiliBiliIE):
+    @classmethod
+    def ie_key(cls):
+        # Preserve yt-dlp's explicit redirect routing (e.g. b23.tv -> BiliBili).
+        return BiliBiliIE.ie_key()
+
     def _real_extract(self, url):
         try:
             return super()._real_extract(url)

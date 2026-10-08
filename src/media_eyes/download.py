@@ -17,7 +17,10 @@ def media_filter(info, *, incomplete=False):
     if info.get("is_live") or (info.get("duration") or 0) > 3600:
         return "Live/long media is unsupported"
     protocol = info.get("protocol")
-    if protocol and protocol not in ("http", "https", "m3u8_native", "http_dash_segments"):
+    if protocol and any(
+        part not in ("http", "https", "m3u8_native", "http_dash_segments")
+        for part in protocol.split("+")
+    ):
         return "Only native HTTP media downloads are permitted"
     return None
 
@@ -64,8 +67,8 @@ def download():
     ) as downloader:
         from .bilibili import BilibiliPublicApiIE
 
-        downloader.add_info_extractor(BilibiliPublicApiIE())
         downloader.add_default_info_extractors()
+        downloader.add_info_extractor(BilibiliPublicApiIE())
         backend = sys.argv[3] if len(sys.argv) > 3 else "yt-dlp"
         if backend != "yt-dlp":
             from .providers import resolve

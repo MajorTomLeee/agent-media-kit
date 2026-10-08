@@ -17,12 +17,12 @@ def call(cache, tool, arguments):
         check=True,
     )
     response = json.loads(result.stdout)
-    if response.get("isError"):
-        raise RuntimeError(response["content"][0]["text"])
     # The engine forwards safe structured records only, not signed CDN addresses.
     for line in result.stderr.splitlines():
         if line.startswith('{"event":'):
             print(line)
+    if response.get("isError"):
+        raise RuntimeError(response["content"][0]["text"])
     return response["content"]
 
 

@@ -13,6 +13,8 @@ from urllib.parse import urlsplit
 
 from .cache import cached_operation, make_lock, prune, write_json
 
+LOCAL_MEDIA_FORMATS = "mov,matroska,mp3,wav,ogg,flac,aac,mpegts,mpeg,avi"
+
 
 class MediaEyes:
     def __init__(self, cache_dir: Path, roots: list[Path] | None = None):
@@ -53,7 +55,7 @@ class MediaEyes:
             args = [
                 args[0],
                 "-format_whitelist",
-                "mov,matroska,mp3,wav,ogg,flac,aac,mpegts,mpeg,avi",
+                LOCAL_MEDIA_FORMATS,
                 *args[1:],
             ]
         try:

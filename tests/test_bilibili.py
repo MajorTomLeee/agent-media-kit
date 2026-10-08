@@ -119,3 +119,16 @@ def test_explicit_shortlink_redirect_routes_to_our_extractor():
         downloader.add_default_info_extractors()
         downloader.add_info_extractor(BilibiliPublicApiIE())
         assert isinstance(downloader.get_info_extractor("BiliBili"), BilibiliPublicApiIE)
+
+
+def test_native_merger_input_cannot_open_network_or_playlist_protocols():
+    from yt_dlp import YoutubeDL
+    from yt_dlp.postprocessor.ffmpeg import FFmpegMergerPP
+
+    from media_eyes.download import MERGER_ARGS
+
+    with YoutubeDL({"postprocessor_args": {"merger+ffmpeg_i": MERGER_ARGS}}) as downloader:
+        args = FFmpegMergerPP(downloader)._configuration_args("ffmpeg", ["_i1", "_i"])
+        assert args == MERGER_ARGS
+        assert args[args.index("-protocol_whitelist") + 1] == "file,pipe"
+        assert "concat" not in args[args.index("-format_whitelist") + 1]

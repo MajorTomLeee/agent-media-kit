@@ -10,7 +10,10 @@ from pathlib import Path
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError, ExtractorError
 
+from .core import LOCAL_MEDIA_FORMATS
 from .diagnostics import classify, emit
+
+MERGER_ARGS = ["-protocol_whitelist", "file,pipe", "-format_whitelist", LOCAL_MEDIA_FORMATS]
 
 
 def media_filter(info, *, incomplete=False):
@@ -57,6 +60,8 @@ def download():
             "fragment_retries": 1,
             "format": "bv[height<=720]+ba/b[height<=720]/b",
             "merge_output_format": "mp4",
+            "postprocessor_args": {"merger+ffmpeg_i": MERGER_ARGS},
+            "fixup": "never",
             "outtmpl": sys.argv[2],
             "external_downloader": {"default": "native"},
             "proxy": "",

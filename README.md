@@ -38,7 +38,7 @@ Add to your MCP client configuration:
   "mcpServers": {
     "agent-media-kit": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.0", "agent-media-kit"]
+      "args": ["--from", "git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.1", "agent-media-kit"]
     }
   }
 }
@@ -47,7 +47,7 @@ Add to your MCP client configuration:
 Claude Code:
 
 ```sh
-claude mcp add agent-media-kit -- uvx --from git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.0 media-eyes
+claude mcp add agent-media-kit -- uvx --from git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.1 agent-media-kit
 ```
 
 Then ask:
@@ -57,7 +57,7 @@ Then ask:
 For local speech transcription, change the package argument to:
 
 ```text
-agent-media-kit[transcription] @ git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.0
+agent-media-kit[transcription] @ git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.1
 ```
 
 The first transcription downloads the Whisper model. Default: `base`, CPU int8. Set `MEDIA_EYES_WHISPER_MODEL` to select another model. Alternatively install `whisper-cli` from whisper.cpp and set `MEDIA_EYES_WHISPER_CPP_MODEL` to your local ggml model file; the included Dockerfile builds that backend with the multilingual base model.
@@ -129,7 +129,7 @@ for await (const message of query({
     mcpServers: {
       'agent-media-kit': {
         command: 'uvx',
-        args: ['--from', 'git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.0', 'agent-media-kit'],
+        args: ['--from', 'git+https://github.com/MajorTomLeee/agent-media-kit@v0.2.1', 'agent-media-kit'],
       },
     },
     allowedTools: ['mcp__agent-media-kit__*'],

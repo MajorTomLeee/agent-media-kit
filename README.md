@@ -88,6 +88,18 @@ Times are seconds. Image outputs alternate timestamp labels and JPEG image block
 
 `open_media(source, backend="yt-dlp")` is free by default. There is no automatic paid fallback or automatic reading of your browser cookies.
 
+For ordinary Bilibili BV/AV videos, a webpage HTTP 412 triggers one fallback to the public WBI-signed API, using yt-dlp's pinned signing and stream parser. Requested `?p=N` parts are preserved. This does not log in, solve CAPTCHAs, or unlock paid/preview-only videos. API and CDN requests still use the public-IP socket guard. If the API is also blocked, the tool reports the real failure category and HTTP status rather than claiming it watched the video.
+
+Website failures include `PLATFORM_BLOCKED` (HTTP 412/429), `ACCESS_REQUIRED` (401/403), `SOURCE_UNAVAILABLE` (404/410), and `DRM_UNSUPPORTED`. Safe lifecycle/fallback diagnostics go to stderr as JSON; MCP results remain on stdout. Credentials, cookies and signed CDN URLs are not included in diagnostic records.
+
+Run the real website smoke yourself after installing the package:
+
+```bash
+python tests/smoke_website.py 'https://www.bilibili.com/video/BV1pg411W79J/'
+```
+
+This exercises the installed MCP JSON interface, actual download and AV merging, six timestamped frames, and a WAV segment. The GitHub Actions **Agent Media Kit CI → Run workflow** path runs the same opt-in live check on a public-DNS Linux runner. Ordinary CI uses the stable synthetic fixture; third-party website access is verified separately rather than hidden behind mocked tests. Site policy changes can still require renewed verification.
+
 | Backend | Configuration | Scope |
 | --- | --- | --- |
 | `yt-dlp` | None | All installed extractors, including Bilibili, YouTube, Douyin, TikTok and Xiaohongshu; actual access varies |

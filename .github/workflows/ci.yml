@@ -2,6 +2,12 @@ name: Agent Media Kit CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Public video URL for opt-in live verification
+        required: true
+        default: https://www.bilibili.com/video/BV1pg411W79J/
 permissions:
   contents: read
 jobs:
@@ -19,3 +25,8 @@ jobs:
       - run: pytest -q
       - name: Public video URL smoke
         run: python tests/smoke_url.py https://github.com/MajorTomLeee/agent-media-kit/releases/download/v0.1.0/media-eyes-demo.mp4
+      - name: Real website download, MCP frames and audio smoke
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          MEDIA_SOURCE: ${{ inputs.source }}
+        run: python tests/smoke_website.py "$MEDIA_SOURCE"

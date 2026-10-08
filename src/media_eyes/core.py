@@ -63,28 +63,22 @@ class MediaEyes:
         except subprocess.TimeoutExpired as exc:
             raise ValueError("Media processing exceeded its time limit") from exc
         except subprocess.CalledProcessError as exc:
-            # Downloader errors can include signed URLs or credentials.
-            diagnostic = (exc.stderr or b"").decode(errors="replace").lower()
-            for terms, message in [
-                (
-                    ("sign in", "login", "cookies"),
-                    "ACCESS_REQUIRED: This source needs a permitted session or fresh cookies; upload a local copy or configure an authorized resolver.",
-                ),
-                (("drm",), "DRM_UNSUPPORTED: Protected media is unsupported."),
-                (
-                    ("geo", "country", "region"),
-                    "REGION_RESTRICTED: This source is unavailable in the worker's region.",
-                ),
-                (
-                    ("429", "rate limit", "captcha", "bot"),
-                    "PLATFORM_BLOCKED: Platform rate limit or anti-bot protection; retry later or use an authorized resolver.",
-                ),
-            ]:
-                if args[0] == sys.executable and any(term in diagnostic for term in terms):
-                    raise ValueError(message) from exc
+            if args[0] == sys.executable:
+                from .diagnostics import classify, failure_message, forward
+
+                detail = (exc.stderr or b"").decode(errors="replace")
+                diagnostic = classify(detail)
+                for item in forward(detail):
+                    if item.get("event") == "download_failed" and item.get("error_code"):
+                        diagnostic = item
+                raise ValueError(failure_message(diagnostic)) from exc
             raise ValueError(
                 f"{args[0]} failed; check format, access and installed version"
             ) from exc
+        if args[0] == sys.executable:
+            from .diagnostics import forward
+
+            forward(result.stderr.decode(errors="replace"))
         return result.stdout.decode()
 
     @cached_operation

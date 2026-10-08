@@ -8,6 +8,9 @@ import sys
 from pathlib import Path
 
 from yt_dlp import YoutubeDL
+from yt_dlp.utils import DownloadError, ExtractorError
+
+from .diagnostics import classify, emit
 
 
 def media_filter(info, *, incomplete=False):
@@ -38,7 +41,7 @@ class PublicSocket(socket.socket):
         return 0
 
 
-def main():
+def download():
     socket.socket = PublicSocket
     with YoutubeDL(
         {
@@ -56,8 +59,13 @@ def main():
             "proxy": "",
             "enable_file_urls": False,
             "match_filter": media_filter,
-        }
+        },
+        auto_init=False,
     ) as downloader:
+        from .bilibili import BilibiliPublicApiIE
+
+        downloader.add_info_extractor(BilibiliPublicApiIE())
+        downloader.add_default_info_extractors()
         backend = sys.argv[3] if len(sys.argv) > 3 else "yt-dlp"
         if backend != "yt-dlp":
             from .providers import resolve
@@ -148,5 +156,16 @@ def main():
             (directory / "captions.json").write_text(json.dumps(tracks))
 
 
+def main():
+    emit("download_started")
+    try:
+        download()
+    except (DownloadError, ExtractorError, ValueError, KeyError, TypeError, OSError) as error:
+        emit("download_failed", **classify(error))
+        return 1
+    emit("download_completed")
+    return 0
+
+
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

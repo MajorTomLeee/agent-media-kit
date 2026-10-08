@@ -12,7 +12,7 @@ resolution-markers = [
 
 [[package]]
 name = "agent-media-kit"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "filelock" },
@@ -40,7 +40,7 @@ requires-dist = [
     { name = "mcp", specifier = ">=1.20,<2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.12" },
-    { name = "yt-dlp", specifier = ">=2025.1" },
+    { name = "yt-dlp", specifier = "==2026.8.19" },
 ]
 provides-extras = ["transcription", "audio-analysis", "dev"]
 
